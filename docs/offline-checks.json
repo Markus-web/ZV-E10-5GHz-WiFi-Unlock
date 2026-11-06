@@ -1,0 +1,20 @@
+{
+  "offline_only": true,
+  "camera_connected": false,
+  "checks_passed": [
+    "Python AST parse",
+    "ARM ELF load segments: inverse helper differs only in two data bytes",
+    "Packaged patch ELF identical to demonstrated camera-tested binary",
+    "Backup guards, original preservation, subsystem save, readback failure",
+    "Truncated/unknown library refuses all shell writes",
+    "Private factory/patched full hashes, size and unique byte difference",
+    "Fake-camera patch/restore, mount guards, remount after helper failure",
+    "Fresh directory Wi-Fi source loads the pinned toolkit clone and all CLI help entry points",
+    "Published toolkit: 4 fake-camera tests and 25 shell guard checks",
+    "Public offline tests run without private fixtures",
+    "English/Chinese command blocks match; local links and sensitive-pattern scan pass"
+  ],
+  "toolkit_revision": "67b1b142bff0421d5d666da96ce45f274fd61ee2",
+  "toolkit_source": "fresh GitHub clone",
+  "environment_scope": "Existing owner-provided Python interpreter; code/API checks only, no fresh pip installation or hardware access"
+}

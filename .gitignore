@@ -1,0 +1,7 @@
+vendor/
+.venv/
+private/
+__pycache__/
+*.pyc
+.DS_Store
+*.o
