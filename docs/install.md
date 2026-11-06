@@ -8,13 +8,13 @@ This is a supervised procedure, not an unattended installer. The byte-writing EL
 
 Use a Python 3 virtual environment and libusb. On macOS, install libusb through your normal package manager; `LIBUSB_PATH` can select the library. The common helper also checks Apple Silicon and Intel Homebrew locations. The demonstrated USB path is macOS; Linux needs working USB permissions and remains untested end to end for this package. Windows launchers are not supplied.
 
-This project uses [zv-e10-toolkit `67b1b14`](https://github.com/dino2048/zv-e10-toolkit/commit/67b1b142bff0421d5d666da96ce45f274fd61ee2), which provides the generic Backup-property actions and the existing persistent-session extension interface. Clone the toolkit and check out the pinned commit:
+This project uses [zv-e10-toolkit `e8d4cb5`](https://github.com/dino2048/zv-e10-toolkit/commit/e8d4cb566fa04dac249e10431302e4d950550bde), which provides the generic Backup-property actions and the existing persistent-session extension interface. Clone the toolkit and check out the pinned commit:
 
 ```sh
 mkdir -p vendor
 git clone https://github.com/dino2048/zv-e10-toolkit.git vendor/zv-e10-toolkit
 export ZVE10_TOOLKIT="$PWD/vendor/zv-e10-toolkit"
-git -C "$ZVE10_TOOLKIT" checkout --detach 67b1b142bff0421d5d666da96ce45f274fd61ee2
+git -C "$ZVE10_TOOLKIT" checkout --detach e8d4cb566fa04dac249e10431302e4d950550bde
 PYTHON=python3 sh "$ZVE10_TOOLKIT/linux/scripts/setup.sh"
 export WIFI_PYTHON="$ZVE10_TOOLKIT/linux/.venv/bin/python"
 "$WIFI_PYTHON" -B tools/wifi.py --help

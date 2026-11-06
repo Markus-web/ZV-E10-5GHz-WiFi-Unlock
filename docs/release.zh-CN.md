@@ -17,7 +17,7 @@
 - **已做离线验证**：Wi-Fi 集成工具的文件哈希、补丁前置检查、模拟读写及恢复流程；toolkit 的属性原值校验、私密快照、写后读回和正常／异常关闭。
 - **尚未完整实机验证**：整理后的 Wi-Fi 主机集成及反向单字节恢复程序。离线通过不能替代实际 USB 及文件系统故障下的验证。
 
-依赖固定为 toolkit 提交 `67b1b142bff0421d5d666da96ce45f274fd61ee2`；安装文档包含确切 checkout 命令。验证结果记录在 [offline-checks.json](offline-checks.json)，它是机器可读结果文件，不需要翻译字段名称。
+依赖固定为 toolkit 提交 `e8d4cb566fa04dac249e10431302e4d950550bde`；安装文档包含确切 checkout 命令。验证结果记录在 [offline-checks.json](offline-checks.json)，它是机器可读结果文件，不需要翻译字段名称。
 
 ## 不连接相机的自检
 

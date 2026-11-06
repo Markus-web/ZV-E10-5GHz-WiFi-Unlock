@@ -8,13 +8,13 @@
 
 需要 Python 3 虚拟环境和 libusb。macOS 可通过常用包管理器安装 libusb；也可用 `LIBUSB_PATH` 指定库路径。toolkit 会检查 Apple Silicon 和 Intel Homebrew 的常用路径。已有实机流程使用 macOS；本项目尚未在 Linux 上完整验证，未提供 Windows 启动器。
 
-本项目使用 [zv-e10-toolkit `67b1b14`](https://github.com/dino2048/zv-e10-toolkit/commit/67b1b142bff0421d5d666da96ce45f274fd61ee2) 提供的通用 Backup 属性接口和持久会话扩展入口。克隆后切换到以下固定提交：
+本项目使用 [zv-e10-toolkit `e8d4cb5`](https://github.com/dino2048/zv-e10-toolkit/commit/e8d4cb566fa04dac249e10431302e4d950550bde) 提供的通用 Backup 属性接口和持久会话扩展入口。克隆后切换到以下固定提交：
 
 ```sh
 mkdir -p vendor
 git clone https://github.com/dino2048/zv-e10-toolkit.git vendor/zv-e10-toolkit
 export ZVE10_TOOLKIT="$PWD/vendor/zv-e10-toolkit"
-git -C "$ZVE10_TOOLKIT" checkout --detach 67b1b142bff0421d5d666da96ce45f274fd61ee2
+git -C "$ZVE10_TOOLKIT" checkout --detach e8d4cb566fa04dac249e10431302e4d950550bde
 PYTHON=python3 sh "$ZVE10_TOOLKIT/linux/scripts/setup.sh"
 export WIFI_PYTHON="$ZVE10_TOOLKIT/linux/.venv/bin/python"
 "$WIFI_PYTHON" -B tools/wifi.py --help
