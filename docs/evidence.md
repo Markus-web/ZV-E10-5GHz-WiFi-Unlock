@@ -7,7 +7,8 @@ This document summarizes hardware tests on the first-generation ZV-E10, firmware
 ## Camera and configuration
 
 - Camera: first-generation Sony ZV-E10, displayed firmware 2.02.
-- Host: macOS, using a persistent USB-C service session.
+- Modification host: macOS, using a persistent USB-C service session.
+- Additional read-only integration host: Linux x86_64 with polkit/libusb.
 - Region: mainland China; B=2/C=22, selecting XR/76 and XR/143.
 - Modification: `CautionConfig.so` at `0xD778E4:20→1B` and three Backup properties.
 - Record dates: 2026-11-05 through 2026-11-07.
@@ -25,8 +26,11 @@ This document summarizes hardware tests on the first-generation ZV-E10, firmware
 | USB-C in-place installation | Starting from an intact factory library, the non-truncating helper wrote `20→1B`; full export differed at only that byte | Normal installation does not require fastboot |
 | Post-install battery cycle | USB/battery disconnected; full library length and patch persisted, properties `01/02/16`, `/usr` read-only; owner confirmed the menu | Battery removal alone does not prove a genuine cold boot; earlier functional tests were not repeated after this cycle |
 | Warm-image recovery, 2026-11-07 | Old warm resume yielded TypeRK/four items despite the correct patch and values. After a verified Sony WBI invalidation and cold boot, both global and current Page1 had TypeNB/five items; owner confirmed menu, 5 GHz phone transfer and 5 GHz router remote operation | Full 60 MiB partition backed up twice; only first 512 bytes changed. No new channel or controlled speed measurement |
+| Linux read-only integration, 2026-11-07 | Factory ZV-E10 2.02 accepted two exact version reads, exported the complete factory library and both Backup files, read `00/09/09`, confirmed `/usr` read-only, identified warm-resumed TypeRK/four-item Page1, closed normally and returned to Mass Storage | Physical validation of integrated `inspect`, `boot-check` and teardown only; no requested camera write, remount, helper upload or WBI action |
 
 Hotspot/router functionality and the final USB-C installation have separate hardware records. They do not constitute a complete hardware acceptance test of the newly integrated host tool.
+
+The Linux read-only record is reproducible from a closed private session with `tools/session_summary.py`. Its public output deliberately omits raw mounts, property IDs and values, process IDs, addresses, boot-log lines and snapshot tokens. The source session remains private.
 
 ## In-place writing and recovery lessons
 

@@ -14,8 +14,9 @@
 ## Validation scope
 
 - **Hardware-validated underlying procedure:** one byte plus three properties, native menu, 5 GHz hotspot photo transfer, remote shooting through a 5 GHz router, and post-install cold-boot persistence. See [test records](evidence.md).
-- **Offline-validated integration:** target hashes, patch preconditions, simulated writes and restore flow; toolkit original-value guards, private snapshots, readback and normal/error teardown.
-- **Not fully hardware-validated:** the integrated Wi-Fi host tool and reverse-byte helper. Offline checks do not replace validation of real USB or filesystem failures.
+- **Hardware-validated read-only integration:** on Linux x86_64, exact 2.02 version gating, full `inspect` exports, property reads, mount reporting, warm-resume `boot-check`, normal teardown and return to Mass Storage.
+- **Offline-validated write integration:** target hashes, patch preconditions, simulated writes and restore flow; toolkit original-value guards, private snapshots, readback and normal/error teardown.
+- **Not fully hardware-validated:** integrated patch, rollback and WBI write actions, the reverse-byte helper, Linux write behavior and real USB or filesystem failures.
 
 The dependency is pinned to toolkit commit `e8d4cb566fa04dac249e10431302e4d950550bde`; installation includes the exact checkout command. Results are in [offline-checks.json](offline-checks.json), a machine-readable result file whose field names are language-independent.
 
@@ -26,6 +27,7 @@ After preparing the environment and variables in [installation](install.md), run
 ```sh
 "$WIFI_PYTHON" -B tools/check_offline.py
 "$WIFI_PYTHON" -B -m unittest discover -s tools -p test_safety.py -v
+"$WIFI_PYTHON" -B -m unittest discover -s tools -p test_session_summary.py -v
 "$WIFI_PYTHON" -B -m unittest discover -s "$ZVE10_TOOLKIT/linux/tests" -v
 "$WIFI_PYTHON" -B "$ZVE10_TOOLKIT/linux/host/zve10_terminal_server.py" --self-test
 ```
@@ -36,4 +38,4 @@ These checks neither connect to a camera nor require private firmware files. Mai
 
 Exclude `private/`, `vendor/`, virtual environments and external camera backups from public archives. `.gitignore` controls Git tracking and does not protect arbitrary zip operations. Private snapshots may contain device identifiers, credentials or keys.
 
-New SET_FILE2 uploads, version enforcement, WBI transaction guards and full readback have offline simulation tests. The 2026-11-07 underlying successes were on system **2.02**; system 2.03 is unsupported. The exact Sony ELF source package was 2.03, not the installed camera system. New sysfs identity checks, integrated USB execution, rollback and real power/USB failure behavior remain untested on hardware.
+New SET_FILE2 uploads, version enforcement, WBI transaction guards and full readback have offline simulation tests. A 2026-11-07 Linux session physically validated the read-only integration and privacy-safe summary against system **2.02**. System 2.03 is unsupported. The exact Sony ELF source package was 2.03, not the installed camera system. Integrated writes, new sysfs identity checks, rollback and real power/USB failure behavior remain untested on hardware.

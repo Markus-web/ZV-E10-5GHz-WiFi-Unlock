@@ -14,8 +14,9 @@
 ## 验证范围
 
 - **已有实机验证**：一字节加三个属性的底层修改、原生菜单、5 GHz 热点传图、5 GHz 路由器远程拍摄及安装后冷启动保留，见[实测记录](evidence.zh-CN.md)。
-- **已做离线验证**：Wi-Fi 集成工具的文件哈希、补丁前置检查、模拟读写及恢复流程；toolkit 的属性原值校验、私密快照、写后读回和正常／异常关闭。
-- **尚未完整实机验证**：整理后的 Wi-Fi 主机集成及反向单字节恢复程序。离线通过不能替代实际 USB 及文件系统故障下的验证。
+- **只读集成已实机验证**：Linux x86_64 上的 2.02 精确版本门控、完整 `inspect` 导出、属性读取、挂载报告、暖恢复 `boot-check`、正常关闭及返回海量存储模式。
+- **写入集成已做离线验证**：目标哈希、补丁前置检查、模拟写入及恢复流程；toolkit 的属性原值校验、私密快照、写后读回和正常／异常关闭。
+- **尚未完整实机验证**：集成补丁、回滚和 WBI 写入操作、反向单字节 helper、Linux 写入行为及真实 USB／文件系统故障。
 
 依赖固定为 toolkit 提交 `e8d4cb566fa04dac249e10431302e4d950550bde`；安装文档包含确切 checkout 命令。验证结果记录在 [offline-checks.json](offline-checks.json)，它是机器可读结果文件，不需要翻译字段名称。
 
@@ -26,6 +27,7 @@
 ```sh
 "$WIFI_PYTHON" -B tools/check_offline.py
 "$WIFI_PYTHON" -B -m unittest discover -s tools -p test_safety.py -v
+"$WIFI_PYTHON" -B -m unittest discover -s tools -p test_session_summary.py -v
 "$WIFI_PYTHON" -B -m unittest discover -s "$ZVE10_TOOLKIT/linux/tests" -v
 "$WIFI_PYTHON" -B "$ZVE10_TOOLKIT/linux/host/zve10_terminal_server.py" --self-test
 ```
@@ -36,4 +38,4 @@
 
 不要把 `private/`、`vendor/`、虚拟环境或外部相机备份加入公开压缩包。`.gitignore` 只影响 Git 文件跟踪，不会自动排除任意方式打包的内容。私密快照可能含设备标识、凭据或密钥。
 
-新增 SET_FILE2 上传、版本保护、WBI 执行保护和完整回读均经过离线模拟测试。2026-11-07 的底层成功操作运行在系统 **2.02**；不支持系统 2.03。Sony 原厂 ELF 的来源更新包为 2.03，不等于相机安装系统。新增 sysfs 身份检查、完整 USB 执行集成、回滚及真实断电/USB 故障行为仍待实机验证。
+新增 SET_FILE2 上传、版本保护、WBI 执行保护和完整回读均经过离线模拟测试。2026-11-07 的 Linux 会话在系统 **2.02** 上实机验证了只读集成和隐私安全摘要；不支持系统 2.03。Sony 原厂 ELF 的来源更新包为 2.03，不等于相机安装系统。集成写入、新增 sysfs 身份检查、回滚及真实断电／USB 故障行为仍待实机验证。

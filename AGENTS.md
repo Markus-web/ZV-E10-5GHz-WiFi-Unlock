@@ -1,6 +1,6 @@
 # AI agent entry point
 
-Read README.md, docs/install.md, docs/regions.md, docs/recovery.md, and docs/release.md before device access. Do not rely on earlier chat history. Explain results in the owner's language. Distinguish camera-tested operations, static evidence, and the offline-only validation of the Wi-Fi integration.
+Read README.md, docs/install.md, docs/regions.md, docs/recovery.md, and docs/release.md before device access. Do not rely on earlier chat history. Explain results in the owner's language. Distinguish camera-tested operations, static evidence, Linux hardware validation of the read-only integration, and offline-only validation of write operations.
 
 ## Scope and permission
 
@@ -35,4 +35,4 @@ Report file/property state, cold-boot persistence, user-reported menu/function r
 
 ## Privacy and handoff
 
-Put all Wi-Fi session output in ignored `private/`. The reused toolkit also maintains its normal session pointer inside its own checkout. They may contain device identity, credentials, and keys; never commit or upload them. Publish only carefully redacted summaries. End with evidence paths, actions completed, current state, recovery readiness, and limitations. The Wi-Fi integration has offline checks only; report that accurately and use the existing hardware records for the underlying procedure.
+Put all Wi-Fi session output in ignored `private/`. The reused toolkit also maintains its normal session pointer inside its own checkout. They may contain device identity, credentials, and keys; never commit or upload them. Use `tools/session_summary.py` after closing a read-only session to produce a privacy-safe machine-readable result; do not publish the private source directory. End with evidence paths, actions completed, current state, recovery readiness, and limitations. Report that Linux `inspect` and `boot-check` have hardware validation, while integrated patch, rollback and WBI write actions remain offline-validated only.

@@ -2,11 +2,11 @@
 
 **简体中文** | [English](install.md)
 
-本流程需要用户与 Agent 配合完成。系统 2.02 的单字节写入、Jiritsu 上传和底层服务、Backup 操作已有实机记录；`wifi.py` 只负责 Wi-Fi 专用操作，直接调用 zv-e10-toolkit 的服务端、客户端、传输方法和通用 Backup 接口。Wi-Fi 主机工具集成已完成离线检查，验证范围见[许可与验证范围](release.zh-CN.md)。操作前先读 [AGENTS.md](../AGENTS.md) 和[恢复说明](recovery.zh-CN.md)。
+本流程需要用户与 Agent 配合完成。系统 2.02 的单字节写入、Jiritsu 上传和底层服务、Backup 操作已有实机记录；`wifi.py` 只负责 Wi-Fi 专用操作，直接调用 zv-e10-toolkit 的服务端、客户端、传输方法和通用 Backup 接口。Linux 上只读 `inspect`、`boot-check` 和正常关闭已通过实机验证；集成写入操作仍仅经过离线检查。验证范围见[许可与验证范围](release.zh-CN.md)。操作前先读 [AGENTS.md](../AGENTS.md) 和[恢复说明](recovery.zh-CN.md)。
 
 ## 1. 准备环境，暂不连接相机
 
-需要 Python 3 虚拟环境和 libusb。macOS 可通过常用包管理器安装 libusb；也可用 `LIBUSB_PATH` 指定库路径。toolkit 会检查 Apple Silicon 和 Intel Homebrew 的常用路径。已有实机流程使用 macOS；本项目尚未在 Linux 上完整验证，未提供 Windows 启动器。
+需要 Python 3 虚拟环境和 libusb。macOS 可通过常用包管理器安装 libusb；也可用 `LIBUSB_PATH` 指定库路径。toolkit 会检查 Apple Silicon 和 Intel Homebrew 的常用路径。Linux x86_64 已通过 polkit 和 libusb 完成只读会话实机验证；Linux 写入路径尚未验证。未提供 Windows 启动器。
 
 本项目使用 [zv-e10-toolkit `e8d4cb5`](https://github.com/dino2048/zv-e10-toolkit/commit/e8d4cb566fa04dac249e10431302e4d950550bde) 提供的通用 Backup 属性接口和持久会话扩展入口。克隆后切换到以下固定提交：
 
@@ -112,4 +112,10 @@ Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再通过一次
 
 要求返回 `page1.type: TypeNB`、`page1.count: 5`，没有暖恢复标志，并由机主确认原生频带页能打开。`boot-check` 读取全局 Page1 对象；最终仍以相机屏幕验证。若补丁及属性正确但返回 TypeRK/4，请在 Agent 协助下按[暖镜像恢复流程](wbi.zh-CN.md)处理。WBI 失效是单独确认的 eMMC 操作，不能自动接在补丁之后执行。
 
-需要功能检查或活动无线状态采样时，按[验收与恢复](recovery.zh-CN.md)执行。完成后正常关闭验收会话，所有个人备份均不得混入公开发布包。
+需要功能检查或活动无线状态采样时，按[验收与恢复](recovery.zh-CN.md)执行。完成后正常关闭验收会话，再生成不包含原始挂载信息、属性 ID／值、进程 ID、地址、日志或快照编号的隐私安全摘要：
+
+```sh
+"$WIFI_PYTHON" -B tools/session_summary.py private/verify-01
+```
+
+只有在会话已关闭、保持只读、目标库已知、`/usr` 保持只读、Page1 布局已知、无拒绝请求且正常关闭时，命令才返回成功。即使分享摘要，也必须继续私密保存原始会话目录；所有个人备份均不得混入公开发布包。

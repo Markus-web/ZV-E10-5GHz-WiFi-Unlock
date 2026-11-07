@@ -8,14 +8,19 @@
   "toolkit_source": "fresh GitHub clone at pinned revision",
   "checks_passed": [
     "20 safety unit/simulation tests in tools/test_safety.py",
+    "5 privacy-safe session summary tests in tools/test_session_summary.py",
     "check_offline.py: AST, Page1 parser and boot-check, ARM inverse load segments, Backup guards and unknown-library refusal",
     "Pinned toolkit: 8 offline tests and 25 service shell guard checks",
     "2.02 historical helper: packaged, uploaded and readback files identical byte for byte",
     "2.02 historical WBI: reconstruction source hash, full before/after hashes and exact first-512-byte-zero rule verified",
     "Offline CLI help, local Markdown links and English/Chinese command parity"
   ],
+  "hardware_validated_separately": [
+    "Linux x86_64 read-only inspect, boot-check, normal teardown and Mass Storage return on ZV-E10 2.02",
+    "Privacy-safe session summary against the closed Linux hardware session"
+  ],
   "not_hardware_validated": [
-    "New integrated SET_FILE2/WBI actions",
+    "Integrated patch, restore and WBI write actions",
     "Additional sysfs/block-node identity checks",
     "WBI restoration",
     "Real USB/power failure handling"

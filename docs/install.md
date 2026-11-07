@@ -2,11 +2,11 @@
 
 **English** | [简体中文](install.zh-CN.md)
 
-This is a supervised procedure, not an unattended installer. The byte-writing ELF and underlying service/Backup operations have hardware validation records. `wifi.py` contains only Wi-Fi-specific operations; it imports the existing zv-e10-toolkit server, client, transport helpers and generic Backup property actions. This integration has offline checks only. Read [AGENTS.md](../AGENTS.md) and [recovery](recovery.md) first.
+This is a supervised procedure, not an unattended installer. The byte-writing ELF and underlying service/Backup operations have hardware validation records. `wifi.py` contains only Wi-Fi-specific operations; it imports the existing zv-e10-toolkit server, client, transport helpers and generic Backup property actions. Linux read-only `inspect`, `boot-check` and teardown have physical-camera validation; integrated write operations have offline checks only. Read [AGENTS.md](../AGENTS.md) and [recovery](recovery.md) first.
 
 ## 1. Prepare without connecting
 
-Use a Python 3 virtual environment and libusb. On macOS, install libusb through your normal package manager; `LIBUSB_PATH` can select the library. The common helper also checks Apple Silicon and Intel Homebrew locations. The demonstrated USB path is macOS; Linux needs working USB permissions and remains untested end to end for this package. Windows launchers are not supplied.
+Use a Python 3 virtual environment and libusb. On macOS, install libusb through your normal package manager; `LIBUSB_PATH` can select the library. The common helper also checks Apple Silicon and Intel Homebrew locations. Linux x86_64 has physical-camera validation for the read-only session path using polkit and libusb; the Linux write path remains untested. Windows launchers are not supplied.
 
 This project uses [zv-e10-toolkit `e8d4cb5`](https://github.com/dino2048/zv-e10-toolkit/commit/e8d4cb566fa04dac249e10431302e4d950550bde), which provides the generic Backup-property actions and the existing persistent-session extension interface. Clone the toolkit and check out the pinned commit:
 
@@ -112,4 +112,10 @@ Run the read-only check in the new ready session:
 
 Require `page1.type: TypeNB`, `page1.count: 5`, no warm-resume markers, and the owner's confirmation that the native band page opens. `boot-check` reads the global Page1 object; the camera menu remains the final UI check. If the result is TypeRK/four items while the patch and properties match, follow [WBI recovery](wbi.md) under Agent supervision. WBI invalidation is a separate confirmed eMMC operation; it is never automatically chained to the patch.
 
-Use [verification steps](recovery.md) for optional functional checks and read-only active radio sampling. Close the verification session normally. Keep all private backups outside any public archive.
+Use [verification steps](recovery.md) for optional functional checks and read-only active radio sampling. Close the verification session normally. Then create a privacy-safe summary without copying raw mounts, property IDs or values, process IDs, addresses, logs or snapshot tokens:
+
+```sh
+"$WIFI_PYTHON" -B tools/session_summary.py private/verify-01
+```
+
+The command exits nonzero unless the closed session was read-only, used a known library, retained `/usr` read-only, returned a known Page1 layout, had no refused requests and completed normal teardown. Keep the original session and all private backups outside any public archive even when sharing the summary.
