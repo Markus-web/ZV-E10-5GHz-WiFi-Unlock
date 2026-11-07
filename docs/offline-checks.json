@@ -1,20 +1,28 @@
 {
   "offline_only": true,
   "camera_connected": false,
-  "checks_passed": [
-    "Python AST parse",
-    "ARM ELF load segments: inverse helper differs only in two data bytes",
-    "Packaged patch ELF identical to demonstrated camera-tested binary",
-    "Backup guards, original preservation, subsystem save, readback failure",
-    "Truncated/unknown library refuses all shell writes",
-    "Private factory/patched full hashes, size and unique byte difference",
-    "Fake-camera patch/restore, mount guards, remount after helper failure",
-    "Fresh directory Wi-Fi source loads the pinned toolkit clone and all CLI help entry points",
-    "Published toolkit: 8 fake-camera tests and 25 shell guard checks",
-    "Public offline tests run without private fixtures",
-    "English/Chinese command blocks match; local links and sensitive-pattern scan pass"
-  ],
+  "supported_camera_system": "ZV-E10 first generation 2.02 / 30110_05.2025031501",
+  "rejected_camera_system": "2.03 / 30110_06.2026060501",
+  "sony_tool_source_package": "Official ZV-E10 2.03 updater; not the installed system version",
   "toolkit_revision": "e8d4cb566fa04dac249e10431302e4d950550bde",
-  "toolkit_source": "fresh GitHub clone",
-  "environment_scope": "Existing owner-provided Python interpreter; code/API checks only, no fresh pip installation or hardware access"
+  "toolkit_source": "fresh GitHub clone at pinned revision",
+  "checks_passed": [
+    "20 safety unit/simulation tests in tools/test_safety.py",
+    "check_offline.py: AST, Page1 parser and boot-check, ARM inverse load segments, Backup guards and unknown-library refusal",
+    "Pinned toolkit: 8 offline tests and 25 service shell guard checks",
+    "2.02 historical helper: packaged, uploaded and readback files identical byte for byte",
+    "2.02 historical WBI: reconstruction source hash, full before/after hashes and exact first-512-byte-zero rule verified",
+    "Offline CLI help, local Markdown links and English/Chinese command parity"
+  ],
+  "not_hardware_validated": [
+    "New integrated SET_FILE2/WBI actions",
+    "Additional sysfs/block-node identity checks",
+    "WBI restoration",
+    "Real USB/power failure handling"
+  ],
+  "not_repeated": [
+    "Camera connection or modification",
+    "Sony package extraction (source containers previously removed)"
+  ],
+  "environment_scope": "Owner-designated Python virtual environment; no packages installed"
 }

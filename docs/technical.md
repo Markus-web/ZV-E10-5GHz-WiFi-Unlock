@@ -58,7 +58,7 @@ Distinguish the ext4-style inode extraction used for offline eMMC evidence from 
 | Analyzed 2.03 `libObj.so` | `cfdc59b94fa56116e9d99154ca03a2c1aaf6039dd272679b78b0b76e21c722ac`; differs from 2.02 |
 | Normal BCM4339 firmware | `cbb464370e3a954736b05ed16377fc53450eda50252f2b8ffe0fd8464ff200b5` |
 
-The camera's displayed version was **2.02**. The internal string `30110_05.2025031501` also appears in the analyzed 2.03 material and is not a sufficient version discriminator. Identical target-library bytes establish a local patch relationship; they do not prove every 2.03 path works. The installer deliberately requires model/version confirmation and the full target hash.
+The camera's displayed version was **2.02**. The 2.02 live `/version.txt` is `30110_05.2025031501`; the recorded installed 2.03 system reports `30110_06.2026060501`. An old shared-library string must not be confused with the live version file. The tool requires two exact 2.02 version-file reads; WBI recovery additionally checks the known 2.02 `libObj.so` fingerprint. Identical target-library bytes alone do not establish 2.03 compatibility.
 
 ## CLM and unresolved regulatory questions
 

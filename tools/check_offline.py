@@ -120,15 +120,15 @@ def main():
             checks.append('Private factory/patched full hashes, size and unique byte difference')
             for action, before, after in (('patch',factory,patched),('restore',patched,factory)):
                 helper = (s.ROOT/'tools'/f'{action}.arm').read_bytes()
-                with patch.object(s,'read_file',side_effect=[before,helper,after]), patch.object(s,'run',return_value='/dev/nflasha15 /usr ext2 ro,relatime 0 0') as run:
+                with patch.object(s,'read_file',side_effect=[before,after]), patch.object(s,'upload_verified'), patch.object(s,'run',return_value='/dev/nflasha15 /usr ext2 ro,relatime 0 0') as run:
                     result = s.dispatch(camera,{'action':action},folder,True)
                     assert result['size'] == s.SIZE
                     commands = [c.args[1] for c in run.call_args_list]
                     assert 'mount -o remount,rw /usr' in commands
-                    assert commands[-2:] == ['mount -o remount,ro /usr',f'busybox rm /tmp/zve10-wifi-{action}']
-                with patch.object(s,'read_file',side_effect=[before,helper]), patch.object(s,'run',return_value='/dev/nflasha15 /usr ext2 ro,relatime 0 0') as run:
+                    assert commands[-2:] == ['mount -o remount,ro /usr',f'busybox rm -f /tmp/jiritsu/zve10-wifi-{action}']
+                with patch.object(s,'read_file',side_effect=[before]), patch.object(s,'upload_verified'), patch.object(s,'run',return_value='/dev/nflasha15 /usr ext2 ro,relatime 0 0') as run:
                     def fail_helper(cam, cmd):
-                        if cmd == f'/tmp/zve10-wifi-{action}':
+                        if cmd == f'/tmp/jiritsu/zve10-wifi-{action}':
                             raise RuntimeError('simulated I/O failure')
                         return '/dev/nflasha15 /usr ext2 ro,relatime 0 0'
                     run.side_effect = fail_helper
@@ -143,4 +143,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # Legacy tests below mock file reads; firmware enforcement is tested in test_safety.py.
+    with patch.object(s, 'check_firmware'):
+        main()

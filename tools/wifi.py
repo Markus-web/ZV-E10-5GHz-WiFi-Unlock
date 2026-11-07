@@ -10,6 +10,9 @@ from pathlib import Path
 import sys
 import uuid
 
+import jiritsu_upload
+import wbi
+
 ROOT = Path(__file__).resolve().parent.parent
 TOOLKIT = Path(os.environ.get('ZVE10_TOOLKIT', ROOT / 'vendor/zv-e10-toolkit')).resolve()
 HOST = TOOLKIT / 'linux/host'
@@ -17,6 +20,7 @@ if not (HOST / 'zve10_common.py').is_file():
     raise SystemExit('Set ZVE10_TOOLKIT to your zv-e10-toolkit checkout; see docs/install.md')
 sys.path.insert(0, str(HOST))
 import zve10_common as common
+from zve10_read_file_jiritsu import read_file as jiritsu_read_file
 try:
     import zve10_backup_properties as backup_properties
 except ImportError as exc:
@@ -28,6 +32,11 @@ FACTORY = '5ad8746a229da259fe00b297e8f897d682f7ae9a13393025b3d1c95a808e68d7'
 PATCHED = '14f42cc09ee1b9ddde5352482c13b68e5a5e97d9d79e8456087b5e0b7af6ff6a'
 OFFSET = 0xD778E4
 KEYS = (0x01071C54, 0x00A5000B, 0x00A5000C)
+FIRMWARE = b'30110_05.2025031501'  # system 2.02; reject 2.03 (30110_06.2026060501)
+HELPER_HASHES = {
+    'patch': 'f8270987db52912e987d2a8c8fd7576096085571a1aa5de73bc98fe21c865ea6',
+    'restore': 'ae3ce7d823a4e19a162befd236db9af99f222bc3b48a44468288b62888a7f712',
+}
 PAGE1_VMA = 0x011EB858
 TYPE_NB_VMA = 0x010E2AD8
 TYPE_RK_VMA = 0x010E2BBC
@@ -94,9 +103,23 @@ def read_file(camera, path):
     return bytes(data)
 
 
+def check_firmware(camera):
+    # Check on every operation, even if a server was started with an override.
+    versions = [read_file(camera, '/version.txt') for _ in range(2)]
+    if versions != [FIRMWARE, FIRMWARE]:
+        raise ValueError('Only ZV-E10 system 2.02 (30110_05.2025031501) is supported; STOP: ' + repr(versions))
+
+
+def upload_verified(camera, path, data):
+    jiritsu_upload.upload(camera, path, data, jiritsu_read_file)
+
+
 def save_private(folder, name, data):
-    with (folder / name).open('xb') as f:
+    fd = os.open(folder / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, 'wb') as f:
         f.write(data)
+        f.flush()
+        os.fsync(f.fileno())
     (folder / name).chmod(0o600)
     common.restore_owner(folder / name)
 
@@ -104,6 +127,9 @@ def save_private(folder, name, data):
 def dispatch(camera, req, folder, allow_write):
     action = req.get('action')
     token = uuid.uuid4().hex
+    if action in ('wbi-prepare', 'wbi-drop'):
+        return wbi.dispatch(camera, req, folder, allow_write, sys.modules[__name__])
+    check_firmware(camera)
     if action == 'inspect':
         data = read_file(camera, TARGET)
         values = {hex(k): backup_properties.dispatch(camera, {'action': 'backup-read', 'id': hex(k)}, folder, False)['value'] for k in KEYS}
@@ -134,14 +160,13 @@ def dispatch(camera, req, folder, allow_write):
         if len(rows) != 1 or rows[0][0] != '/dev/nflasha15' or rows[0][2] != 'ext2' or 'ro' not in rows[0][3].split(','):
             raise ValueError('Unexpected /usr mount; no write')
         helper = (ROOT / 'tools' / (action + '.arm')).read_bytes()
-        remote = '/tmp/zve10-wifi-' + action
-        # Upload ONLY our small helper, never replace the Sony library.
-        run(camera, ': > ' + remote)
+        if digest(helper) != HELPER_HASHES[action]:
+            raise ValueError('Unknown local ARM helper hash; STOP')
+        remote = '/tmp/jiritsu/zve10-wifi-' + action
+        # Reuse the 2.02-tested single SET_FILE2 write and full Jiritsu GET_FILE.
+        run(camera, 'busybox mkdir -p /tmp/jiritsu')
         try:
-            for pos in range(0, len(helper), 48):
-                run(camera, "echo '" + helper[pos:pos+48].hex() + "' | busybox xxd -r -p >> " + remote)
-            if read_file(camera, remote) != helper:
-                raise RuntimeError('Helper upload mismatch')
+            upload_verified(camera, remote, helper)
             run(camera, 'busybox chmod 700 ' + remote)
             try:
                 run(camera, 'mount -o remount,rw /usr')
@@ -157,7 +182,7 @@ def dispatch(camera, req, folder, allow_write):
                 run(camera, 'mount -o remount,ro /usr')
             return {'sha256': digest(after), 'size': len(after), 'only_difference': hex(OFFSET)}
         finally:
-            run(camera, 'busybox rm ' + remote)
+            run(camera, 'busybox rm -f ' + remote)
     raise ValueError('Unknown action')
 
 

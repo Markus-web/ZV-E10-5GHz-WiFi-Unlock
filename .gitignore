@@ -5,3 +5,26 @@ __pycache__/
 *.pyc
 .DS_Store
 *.o
+
+# Private evidence can also be a symlink: ignore both forms.
+/private
+/backups/
+/outputs/
+/session/
+*.bin
+*.bin.gz
+*.part
+*.so
+*.elf
+*.dat
+*.fdat
+*.cab
+*.exe
+*.dmg
+*.img
+*.simg
+*.log
+*.pem
+*.key
+.env
+.env.*

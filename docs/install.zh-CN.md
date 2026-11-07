@@ -2,7 +2,7 @@
 
 **简体中文** | [English](install.md)
 
-本流程需要用户与 Agent 配合完成。相机端的单字节写入和底层服务、Backup 操作已有实机记录；`wifi.py` 只负责 Wi-Fi 专用操作，直接调用 zv-e10-toolkit 的服务端、客户端、传输方法和通用 Backup 接口。Wi-Fi 主机工具集成已完成离线检查，验证范围见[许可与验证范围](release.zh-CN.md)。操作前先读 [AGENTS.md](../AGENTS.md) 和[恢复说明](recovery.zh-CN.md)。
+本流程需要用户与 Agent 配合完成。系统 2.02 的单字节写入、Jiritsu 上传和底层服务、Backup 操作已有实机记录；`wifi.py` 只负责 Wi-Fi 专用操作，直接调用 zv-e10-toolkit 的服务端、客户端、传输方法和通用 Backup 接口。Wi-Fi 主机工具集成已完成离线检查，验证范围见[许可与验证范围](release.zh-CN.md)。操作前先读 [AGENTS.md](../AGENTS.md) 和[恢复说明](recovery.zh-CN.md)。
 
 ## 1. 准备环境，暂不连接相机
 
@@ -66,7 +66,7 @@ sudo ZVE10_TOOLKIT="$ZVE10_TOOLKIT" "$WIFI_PYTHON" -B tools/wifi.py serve --sess
 
 ## 4. 执行已确认的最小修改
 
-Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再把小程序传到 `/tmp` 并逐字节核对；随后临时改为可写挂载，原位修改一个字节，导出完整结果，检查哈希和唯一差异，最后恢复只读挂载并删除临时程序。
+Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再通过一次 Jiritsu SET_FILE2 将固定哈希的小程序传到 `/tmp/jiritsu`，使用 toolkit 的 Jiritsu GET_FILE 完整读回并在主机逐字节核对；随后临时改为可写挂载，原位修改一个字节，导出完整结果，检查哈希和唯一差异，最后恢复只读挂载并删除临时程序。
 
 ```sh
 "$WIFI_PYTHON" -B tools/wifi.py request --session private/install-01 '{"action":"patch"}'
@@ -102,7 +102,7 @@ Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再把小程序
 
 相机 OFF，等待存取指示灯熄灭，拔掉 USB 并取下电池约 30 秒。重新装入后，在 `private/verify-01` 建立新的**只读**会话，等待 `ready` 再检查。保持会话打开，请机主进入“网络 → Wi-Fi 设置 → 频带”，检查 2.4/5 GHz 选择页。
 
-**暖启动检查：**取电池约 30 秒仍可能从相机保存的 Warm Boot Image 恢复旧菜单状态。2026-11-07 实机曾在补丁和三个属性都正确时，运行中的 Wi-Fi 页仍是 TypeRK 四项；内核日志有 `PM: Low-level resume complete`。在验收会话中查看启动日志，并核对当前 Page1 是否为 TypeNB 五项。若仍为 TypeRK 四项或缺少「频带」，停止验收，保留日志与快照；不要重刷同一字节、重复写 Backup 或把取电池当作已经完成真正冷启动。该机经先备份完整 60 MiB `nflasha5`、再用 Sony 原厂工具仅清除其首 512 B 暖镜像入口、断电重启后，日志无暖恢复标志，Page1 和屏幕均恢复五项。此操作尚未集成到公开安装器，也不随仓库分发 Sony 工具；需要单独按已验证的备份、校验和恢复流程处理。
+**暖启动检查：**取电池约 30 秒仍可能从相机保存的 Warm Boot Image 恢复旧菜单状态。2026-11-07 实机曾在补丁和三个属性都正确时，运行中的 Wi-Fi 页仍是 TypeRK 四项；内核日志有 `PM: Low-level resume complete`。在验收会话中查看启动日志，并核对当前 Page1 是否为 TypeNB 五项。若仍为 TypeRK 四项或缺少「频带」，停止验收，保留日志与快照；不要重刷同一字节、重复写 Backup 或把取电池当作已经完成真正冷启动。该机经先备份完整 60 MiB `nflasha5`、再用 Sony 原厂工具仅清除其首 512 B 暖镜像入口、断电重启后，日志无暖恢复标志，Page1 和屏幕均恢复五项。现已提供独立的 `wbi-prepare` / `wbi-drop` 保护流程，详见[暖镜像恢复](wbi.zh-CN.md)，必须完整双备份、另行确认 eMMC 写入并完整回读。Sony 原厂工具需从用户自备官方更新包私密提取，不随仓库分发。
 
 在新建且处于 `ready` 状态的只读会话中执行：
 
@@ -110,6 +110,6 @@ Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再把小程序
 "$WIFI_PYTHON" -B tools/wifi.py request --session private/verify-01 '{"action":"boot-check"}'
 ```
 
-要求返回 `page1.type: TypeNB`、`page1.count: 5`，没有暖恢复标志，并由机主确认原生频带页能打开。`boot-check` 读取全局 Page1 对象；最终仍以相机屏幕验证。若补丁及属性正确但返回 TypeRK/4，请在 Agent 协助下按[暖镜像恢复流程](wbi.zh-CN.md)处理。公开工具不会运行 Sony 专有程序或写入 `nflasha5`。
+要求返回 `page1.type: TypeNB`、`page1.count: 5`，没有暖恢复标志，并由机主确认原生频带页能打开。`boot-check` 读取全局 Page1 对象；最终仍以相机屏幕验证。若补丁及属性正确但返回 TypeRK/4，请在 Agent 协助下按[暖镜像恢复流程](wbi.zh-CN.md)处理。WBI 失效是单独确认的 eMMC 操作，不能自动接在补丁之后执行。
 
 需要功能检查或活动无线状态采样时，按[验收与恢复](recovery.zh-CN.md)执行。完成后正常关闭验收会话，所有个人备份均不得混入公开发布包。

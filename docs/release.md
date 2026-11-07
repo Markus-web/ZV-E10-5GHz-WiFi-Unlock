@@ -25,6 +25,7 @@ After preparing the environment and variables in [installation](install.md), run
 
 ```sh
 "$WIFI_PYTHON" -B tools/check_offline.py
+"$WIFI_PYTHON" -B -m unittest discover -s tools -p test_safety.py -v
 "$WIFI_PYTHON" -B -m unittest discover -s "$ZVE10_TOOLKIT/linux/tests" -v
 "$WIFI_PYTHON" -B "$ZVE10_TOOLKIT/linux/host/zve10_terminal_server.py" --self-test
 ```
@@ -34,3 +35,5 @@ These checks neither connect to a camera nor require private firmware files. Mai
 ## Sharing files
 
 Exclude `private/`, `vendor/`, virtual environments and external camera backups from public archives. `.gitignore` controls Git tracking and does not protect arbitrary zip operations. Private snapshots may contain device identifiers, credentials or keys.
+
+New SET_FILE2 uploads, version enforcement, WBI transaction guards and full readback have offline simulation tests. The 2026-11-07 underlying successes were on system **2.02**; system 2.03 is unsupported. The exact Sony ELF source package was 2.03, not the installed camera system. New sysfs identity checks, integrated USB execution, rollback and real power/USB failure behavior remain untested on hardware.

@@ -66,7 +66,7 @@ Preserve the returned original property values in a private installation note, a
 
 ## 4. Perform the confirmed minimal changes
 
-The Wi-Fi action guards `/usr` mount identity and full library hash, transfers a small helper to `/tmp`, verifies it byte for byte, remounts `/usr` writable, runs the non-truncating writer, exports the result, validates the complete expected hash and unique difference, then remounts read-only and removes the helper.
+The Wi-Fi action guards `/usr` mount identity and full library hash, uploads the hash-pinned helper in one Jiritsu SET_FILE2 write under `/tmp/jiritsu`, reads the whole file through toolkit Jiritsu GET_FILE and compares every byte on the host, remounts `/usr` writable, runs the non-truncating writer, exports the result, validates the complete expected hash and unique difference, then remounts read-only and removes the helper.
 
 ```sh
 "$WIFI_PYTHON" -B tools/wifi.py request --session private/install-01 '{"action":"patch"}'
@@ -102,7 +102,7 @@ Wait for server exit and require `state: closed`, `terminal_closed: true`, `serv
 
 Switch OFF, wait for the access lamp to go out, unplug USB and remove the battery for about 30 seconds. Refit it and start a new **read-only** session in `private/verify-01`, wait for `ready`, then inspect. Ask the owner to check Network → Wi-Fi Settings → Frequency Band and select 2.4/5 GHz while the session remains ready/open.
 
-**Warm boot check:** Battery removal for about 30 seconds may still resume a saved Warm Boot Image with an old four-item Wi-Fi page. In the verification session, inspect the boot log and confirm that the running Page1 has five TypeNB items. If it is still TypeRK/four items or the band menu is missing, stop acceptance and preserve the logs and snapshot. Do not repeat the same byte patch or Backup writes. On the tested camera, a separately backed-up, verified Sony updater operation invalidated only the first 512 bytes of the 60 MiB `nflasha5` warm image; the next boot had no warm-resume log and restored the five-item native page. This operation is not integrated into the public installer, and Sony's updater binary is not distributed here. Handle it separately with verified full-partition backup, readback, and recovery capability.
+**Warm boot check:** Battery removal for about 30 seconds may still resume a saved Warm Boot Image with an old four-item Wi-Fi page. In the verification session, inspect the boot log and confirm that the running Page1 has five TypeNB items. If it is still TypeRK/four items or the band menu is missing, stop acceptance and preserve the logs and snapshot. Do not repeat the same byte patch or Backup writes. On the tested camera, a separately backed-up, verified Sony updater operation invalidated only the first 512 bytes of the 60 MiB `nflasha5` warm image; the next boot had no warm-resume log and restored the five-item native page. Use the separate guarded `wbi-prepare` / `wbi-drop` actions in [WBI recovery](wbi.md), with full double backup, explicit eMMC-write consent and readback. Sony's binary must be extracted privately from the owner's official update package; it is not distributed here.
 
 Run the read-only check in the new ready session:
 
@@ -110,6 +110,6 @@ Run the read-only check in the new ready session:
 "$WIFI_PYTHON" -B tools/wifi.py request --session private/verify-01 '{"action":"boot-check"}'
 ```
 
-Require `page1.type: TypeNB`, `page1.count: 5`, no warm-resume markers, and the owner's confirmation that the native band page opens. `boot-check` reads the global Page1 object; the camera menu remains the final UI check. If the result is TypeRK/four items while the patch and properties match, follow [WBI recovery](wbi.md) under Agent supervision. This public tool does not run the proprietary Sony updater or write `nflasha5`.
+Require `page1.type: TypeNB`, `page1.count: 5`, no warm-resume markers, and the owner's confirmation that the native band page opens. `boot-check` reads the global Page1 object; the camera menu remains the final UI check. If the result is TypeRK/four items while the patch and properties match, follow [WBI recovery](wbi.md) under Agent supervision. WBI invalidation is a separate confirmed eMMC operation; it is never automatically chained to the patch.
 
 Use [verification steps](recovery.md) for optional functional checks and read-only active radio sampling. Close the verification session normally. Keep all private backups outside any public archive.

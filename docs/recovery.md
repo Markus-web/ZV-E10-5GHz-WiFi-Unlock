@@ -58,3 +58,7 @@ If a write succeeded but remounting read-only failed, preserve the original and 
 USB-C service shell requires a normally booting camera. Serious filesystem damage may need additional hardware for BootROM injection and fastboot, using [zv-e10-toolkit recovery](https://github.com/dino2048/zv-e10-toolkit). Review its current docs and hardware requirements before attempting it. No hardware recovery payload or personal partition image is bundled here.
 
 Use the same camera's verified original backup, correct partition table and exact lengths, then read back and compare the whole restored partition. Never flash another camera's Backup, calibration or keys. Never treat `0xD778E4` as a partition offset. Restoring whole old partitions can reintroduce prior experiments and overwrite later changes. Backups and fastboot do not guarantee recovery in every failure mode.
+
+## WBI failure evidence
+
+See [WBI recovery](wbi.md) for exact commands. Preserve both full backups, prewrite/after reads and JSON diagnostics. Never automatically reflash old WBI. A consumed token or timeout requires review, not a retry; only this camera's own verified image may be used through the established fastboot recovery route, followed by complete readback. This release has no hardware-tested WBI restoration.

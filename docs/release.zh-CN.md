@@ -25,6 +25,7 @@
 
 ```sh
 "$WIFI_PYTHON" -B tools/check_offline.py
+"$WIFI_PYTHON" -B -m unittest discover -s tools -p test_safety.py -v
 "$WIFI_PYTHON" -B -m unittest discover -s "$ZVE10_TOOLKIT/linux/tests" -v
 "$WIFI_PYTHON" -B "$ZVE10_TOOLKIT/linux/host/zve10_terminal_server.py" --self-test
 ```
@@ -34,3 +35,5 @@
 ## 分享文件时
 
 不要把 `private/`、`vendor/`、虚拟环境或外部相机备份加入公开压缩包。`.gitignore` 只影响 Git 文件跟踪，不会自动排除任意方式打包的内容。私密快照可能含设备标识、凭据或密钥。
+
+新增 SET_FILE2 上传、版本保护、WBI 执行保护和完整回读均经过离线模拟测试。2026-11-07 的底层成功操作运行在系统 **2.02**；不支持系统 2.03。Sony 原厂 ELF 的来源更新包为 2.03，不等于相机安装系统。新增 sysfs 身份检查、完整 USB 执行集成、回滚及真实断电/USB 故障行为仍待实机验证。
