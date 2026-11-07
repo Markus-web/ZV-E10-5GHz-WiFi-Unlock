@@ -4,6 +4,10 @@
 
 This document explains the minimal modification and the research behind it. See [test records and sources](evidence.md) for hardware results and source material.
 
+## Warm Boot Image and menu construction
+
+Sony stores a Warm Boot Image in the 60 MiB `nflasha5` partition. On the tested 2.02 camera, the patched `CautionConfig.so` jump table and correct Backup values coexisted with an old TypeRK/four-item Page1 after warm resume; the frequency node `0x285` had not been created. Battery removal for about 30 seconds did not guarantee a fresh Page1. After the backed-up Sony updater invalidated the WBI header, the next boot lacked warm-resume markers and both global and current Page1 held TypeNB/five items, including an enabled `0x285`. The owner confirmed the native menu and 5 GHz operations. See [WBI recovery](wbi.md) for guarded acceptance. This is a 2.02 hardware result; 2.03 remains unaccepted under equivalent conditions.
+
 ## Native menu: TypeNB, not a replacement UI
 
 Static comparison found the original A7C Wi-Fi page selects **TypeNB**, which contains Frequency Band; the ZV-E10 selects **TypeRK**, which omits it. The single-byte change in `CautionConfig.so` changes the native page selection at file offset `0xD778E4` from `20` to `1B`. It does not transplant A7C code or invent an English-only menu.

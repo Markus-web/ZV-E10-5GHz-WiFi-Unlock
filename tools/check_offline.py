@@ -63,6 +63,24 @@ def main():
     for p in (s.ROOT / 'tools').glob('*.py'):
         ast.parse(p.read_text())
     checks.append('Python AST parse')
+    base = 0x17670000
+    def page(table, count):
+        return (0).to_bytes(4,'little').hex() + table.to_bytes(4,'little').hex() + count.to_bytes(4,'little').hex()
+    assert s.parse_page1(page(base+s.TYPE_NB_VMA,5),base)['type'] == 'TypeNB'
+    assert s.parse_page1(page(base+s.TYPE_RK_VMA,4),base)['type'] == 'TypeRK'
+    assert s.parse_page1(page(base+s.TYPE_RK_VMA,5),base)['type'] == 'unknown'
+    fails(lambda:s.parse_page1('00',base),RuntimeError)
+    checks.append('Running Page1 parser rejects short/unknown layouts')
+    maps = f'{base:08x}-18600000 r-xp 00000000 fc:0f 18311 /usr/lib/CautionConfig.so\n'
+    node = page(base+s.TYPE_NB_VMA,5)
+    def fake_command(dev, name, cmd, timeout):
+        output = ('152\n' if 'pidof' in cmd else maps if '/maps' in cmd else
+                  node if 'dd if=/proc/' in cmd else '')
+        return {'exit_code':0 if output else 1,'output':output}
+    with patch.object(s.common,'command',side_effect=fake_command):
+        boot = s.boot_check(type('Camera',(),{'dev':object()})())
+    assert boot['page1']['type']=='TypeNB' and not boot['warm_resume_markers']
+    checks.append('Read-only boot-check identifies running five-item Page1')
     a, b = loads(s.ROOT/'tools/patch.arm'), loads(s.ROOT/'tools/restore.arm')
     assert a[0] == b[0], 'Executable code/addresses must match'
     assert a[1][:3] == b[1][:3]

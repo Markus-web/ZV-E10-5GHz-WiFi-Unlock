@@ -27,6 +27,10 @@ Do not power off a camera with a truncated/corrupt library. Never use `cp` over 
 
 Verify the complete exported library and all three properties after writing, confirm `/usr` read-only, remove the temporary helper, then close the session normally and check `terminal_closed=true` and `service_returned=true`. Ask the owner to switch OFF, wait for the access lamp, unplug USB and remove the battery for about 30 seconds, then reconnect. Create a new persistent ready session, inspect again and check the native menu. Keep that session open during owner interaction and read-only active Wi-Fi sampling.
 
+Battery removal alone may still resume the camera's Warm Boot Image. In the new session inspect boot markers and verify the running Wi-Fi Page1 has five TypeNB items. If it remains TypeRK/four items, stop acceptance and preserve evidence; do not repeat the byte or Backup writes. The Sony warm-image invalidation used in the 2026-11-07 recovery is not part of this public tool and must not be improvised without a complete `nflasha5` backup and readback/recovery plan.
+
+Use the read-only `boot-check` action after `inspect`; follow `docs/wbi.md` for the separate Agent-assisted WBI procedure. Do not bundle Sony's proprietary updater or attempt direct block writes through `wifi.py`. Firmware 2.03 had a similar symptom but lacks equivalent post-recovery acceptance; ordinary installation remains limited to displayed 2.02.
+
 Report file/property state, cold-boot persistence, user-reported menu/function results, and measured active radio state separately. Driver channel lists are not regulatory certification. No performance figures without a benchmark. Restore the exact saved originals on request using docs/recovery.md; don't reset all Backup settings.
 
 ## Privacy and handoff

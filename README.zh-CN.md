@@ -23,6 +23,8 @@ ZV-E10 与第一代 A7C 使用相同的 Murata Type 1DR 无线模块和 Broadcom
 
 上表为中国大陆配置。通过 USB-C 数据线连接相机与电脑即可完成修改，无须 fastboot 安装。详细步骤见[安装说明](docs/install.zh-CN.md)。
 
+**安装后还须确认真正冷启动。** Sony 保存的暖启动镜像可能沿用旧的四项 Wi-Fi 页面，即使补丁和属性都正确；取电池 30 秒也可能继续暖恢复。固件 2.02 上已定位并解决此问题。工具增加了只读 `boot-check`，独立的暖镜像失效流程见[安装指南](docs/install.zh-CN.md)。固件 2.03 尚未完成同等条件的重新验收。
+
 ## 功能
 
 - **相机热点**：可在原生菜单中选择 2.4 GHz 或 5 GHz，用于手机传图等直连功能。参见 Sony A7C 官方[频带设置说明](https://helpguide.sony.net/ilc/2020/v1/en/contents/TP1000156044.html)。

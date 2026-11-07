@@ -102,4 +102,14 @@ Wi-Fi 操作先检查 `/usr` 的挂载来源及整文件哈希，再把小程序
 
 相机 OFF，等待存取指示灯熄灭，拔掉 USB 并取下电池约 30 秒。重新装入后，在 `private/verify-01` 建立新的**只读**会话，等待 `ready` 再检查。保持会话打开，请机主进入“网络 → Wi-Fi 设置 → 频带”，检查 2.4/5 GHz 选择页。
 
+**暖启动检查：**取电池约 30 秒仍可能从相机保存的 Warm Boot Image 恢复旧菜单状态。2026-11-07 实机曾在补丁和三个属性都正确时，运行中的 Wi-Fi 页仍是 TypeRK 四项；内核日志有 `PM: Low-level resume complete`。在验收会话中查看启动日志，并核对当前 Page1 是否为 TypeNB 五项。若仍为 TypeRK 四项或缺少「频带」，停止验收，保留日志与快照；不要重刷同一字节、重复写 Backup 或把取电池当作已经完成真正冷启动。该机经先备份完整 60 MiB `nflasha5`、再用 Sony 原厂工具仅清除其首 512 B 暖镜像入口、断电重启后，日志无暖恢复标志，Page1 和屏幕均恢复五项。此操作尚未集成到公开安装器，也不随仓库分发 Sony 工具；需要单独按已验证的备份、校验和恢复流程处理。
+
+在新建且处于 `ready` 状态的只读会话中执行：
+
+```sh
+"$WIFI_PYTHON" -B tools/wifi.py request --session private/verify-01 '{"action":"boot-check"}'
+```
+
+要求返回 `page1.type: TypeNB`、`page1.count: 5`，没有暖恢复标志，并由机主确认原生频带页能打开。`boot-check` 读取全局 Page1 对象；最终仍以相机屏幕验证。若补丁及属性正确但返回 TypeRK/4，请在 Agent 协助下按[暖镜像恢复流程](wbi.zh-CN.md)处理。公开工具不会运行 Sony 专有程序或写入 `nflasha5`。
+
 需要功能检查或活动无线状态采样时，按[验收与恢复](recovery.zh-CN.md)执行。完成后正常关闭验收会话，所有个人备份均不得混入公开发布包。

@@ -10,7 +10,7 @@ This document summarizes hardware tests on the first-generation ZV-E10, firmware
 - Host: macOS, using a persistent USB-C service session.
 - Region: mainland China; B=2/C=22, selecting XR/76 and XR/143.
 - Modification: `CautionConfig.so` at `0xD778E4:20→1B` and three Backup properties.
-- Record dates: 2026-11-05 through 2026-11-06.
+- Record dates: 2026-11-05 through 2026-11-07.
 
 ## Hardware results
 
@@ -23,7 +23,8 @@ This document summarizes hardware tests on the first-generation ZV-E10, firmware
 | Router connection and remote shooting | Active driver reported XR/143; connections on channels 6 and 40; remote capture and photo reception through a 5 GHz router at 40/80 MHz | Dedicated Send to Computer not tested |
 | Minimal-state audit | One target-library byte and three properties; examined other libraries, driver, firmware and 81 NVRAM files matched factory references | Not a whole-eMMC provenance audit; unrelated user settings were not reset |
 | USB-C in-place installation | Starting from an intact factory library, the non-truncating helper wrote `20→1B`; full export differed at only that byte | Normal installation does not require fastboot |
-| Post-install cold boot | USB/battery disconnected; full library length and patch persisted, properties `01/02/16`, `/usr` read-only; owner confirmed the menu | Earlier functional tests were not repeated after this cold boot |
+| Post-install battery cycle | USB/battery disconnected; full library length and patch persisted, properties `01/02/16`, `/usr` read-only; owner confirmed the menu | Battery removal alone does not prove a genuine cold boot; earlier functional tests were not repeated after this cycle |
+| Warm-image recovery, 2026-11-07 | Old warm resume yielded TypeRK/four items despite the correct patch and values. After a verified Sony WBI invalidation and cold boot, both global and current Page1 had TypeNB/five items; owner confirmed menu, 5 GHz phone transfer and 5 GHz router remote operation | Full 60 MiB partition backed up twice; only first 512 bytes changed. No new channel or controlled speed measurement |
 
 Hotspot/router functionality and the final USB-C installation have separate hardware records. They do not constitute a complete hardware acceptance test of the newly integrated host tool.
 

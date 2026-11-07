@@ -28,6 +28,46 @@ FACTORY = '5ad8746a229da259fe00b297e8f897d682f7ae9a13393025b3d1c95a808e68d7'
 PATCHED = '14f42cc09ee1b9ddde5352482c13b68e5a5e97d9d79e8456087b5e0b7af6ff6a'
 OFFSET = 0xD778E4
 KEYS = (0x01071C54, 0x00A5000B, 0x00A5000C)
+PAGE1_VMA = 0x011EB858
+TYPE_NB_VMA = 0x010E2AD8
+TYPE_RK_VMA = 0x010E2BBC
+
+
+def parse_page1(node_hex, base):
+    data = bytes.fromhex(''.join(node_hex.split()))
+    if len(data) != 12:
+        raise RuntimeError('Short Page1 read; STOP')
+    table = int.from_bytes(data[4:8], 'little')
+    count = int.from_bytes(data[8:12], 'little')
+    kind = ('TypeNB' if (table, count) == (base + TYPE_NB_VMA, 5)
+            else 'TypeRK' if (table, count) == (base + TYPE_RK_VMA, 4)
+            else 'unknown')
+    return {'type': kind, 'table': hex(table), 'count': count}
+
+
+def boot_check(camera):
+    # Read the running process, never use stale absolute addresses or write memory.
+    pid_text = run(camera, 'busybox pidof im.elf').strip()
+    if not pid_text.isdecimal():
+        raise RuntimeError('Expected exactly one im.elf process; STOP')
+    maps = run(camera, 'busybox grep CautionConfig.so /proc/' + pid_text + '/maps')
+    rows = [line.split() for line in maps.splitlines() if line.endswith('/usr/lib/CautionConfig.so')]
+    heads = [row for row in rows if len(row) >= 6 and row[1:3] == ['r-xp', '00000000']]
+    if len(heads) != 1:
+        raise RuntimeError('CautionConfig.so module base not unique; STOP')
+    base = int(heads[0][0].split('-')[0], 16)
+    address = base + PAGE1_VMA
+    raw = run(camera, f'busybox dd if=/proc/{pid_text}/mem bs=1 skip={address} count=12 2>/dev/null | busybox xxd -p')
+    page = parse_page1(raw, base)
+    log = common.command(camera.dev, 'unlock_boot_log',
+                         'busybox dmesg | busybox grep -i -E "WARMBOOT|Low-level resume|Waking up from system sleep"', 60)
+    if log['exit_code'] not in (0, 1) or (log['exit_code'] == 1 and log['output'].strip()):
+        raise RuntimeError('Boot-log check failed; STOP: ' + str(log))
+    markers = [line.strip() for line in log['output'].splitlines() if line.strip()]
+    return {'pid': int(pid_text), 'caution_base': hex(base), 'page1_address': hex(address),
+            'page1': page, 'warm_resume_markers': markers,
+            'assessment': ('warm-resume detected' if markers else
+                           'no warm-resume marker observed; confirm menu on camera')}
 
 
 def digest(data):
@@ -72,6 +112,8 @@ def dispatch(camera, req, folder, allow_write):
             save_private(folder, token + '-' + Path(path).name, read_file(camera, path))
         return {'size': len(data), 'sha256': digest(data), 'backup': values,
                 'mounts': run(camera, 'busybox cat /proc/mounts'), 'snapshot': token}
+    if action == 'boot-check':
+        return boot_check(camera)
     if not allow_write:
         raise ValueError('Read-only session; restart with --owner-authorized-write after owner confirmation')
     if action == 'backup-write':

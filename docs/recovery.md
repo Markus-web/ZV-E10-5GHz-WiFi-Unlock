@@ -8,9 +8,11 @@ Separate these observations in the installation record:
 
 1. Complete library hash/length and unique byte difference; three Backup values immediately reread.
 2. `/usr` is read-only, temporary helper removed, service closed normally.
-3. After a genuine cold boot (USB unplugged and battery removed), a **new** persistent session again reports the patched full hash and `01/02/16`.
+3. After USB disconnection and battery removal, a **new** persistent session again reports the patched full hash and `01/02/16`; run `boot-check` and require TypeNB/five items with no warm-resume marker. Battery removal alone does not prove a genuine cold boot.
 4. Owner can enter the native frequency menu. Menu evidence alone is not proof of 5 GHz radio operation.
 5. If requested, test phone photo transfer on the chosen 5 GHz direct hotspot, then separately test router connection and remote shooting. Record actual result and active channel; do not claim a speed improvement without a controlled benchmark.
+
+If the patch and properties match but Page1 remains TypeRK/four items, stop repeated writes and use the [Agent-assisted WBI procedure](wbi.md). Keep the complete `nflasha5` backup private; restore only this camera's own image if the verified recovery plan requires it. Invalidating an obsolete WBI does not permanently disable normal warm boot.
 
 Keep the session ready while asking the owner to use menus. During an active Wi-Fi connection, these allowlisted read commands can be requested, for example:
 

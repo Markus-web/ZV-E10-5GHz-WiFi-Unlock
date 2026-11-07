@@ -23,6 +23,8 @@ Only **one byte in `CautionConfig.so` and three Backup properties** need changin
 
 The table shows the mainland China configuration. Connect the camera to a computer with a USB-C data cable to make these changes; fastboot is not needed for installation. See [installation instructions](docs/install.md).
 
+**After installation, verify a real cold boot.** A saved Sony Warm Boot Image can keep the old four-item Wi-Fi page even when the byte and properties are correct; removing the battery for 30 seconds may still resume it. This was diagnosed and resolved on firmware 2.02. The installer includes a read-only `boot-check`; the separate WBI invalidation procedure is [in the installation guide](docs/install.md). Firmware 2.03 has not received equivalent end-to-end acceptance.
+
 ## Features
 
 - **Camera hotspot:** select 2.4 GHz or 5 GHz in the native menu for direct connections such as phone photo transfers. See Sony's A7C [frequency-band guide](https://helpguide.sony.net/ilc/2020/v1/en/contents/TP1000156044.html).
